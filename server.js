@@ -4,6 +4,7 @@ var express = require('express'),
     app     = express(),
     eps     = require('ejs'),
     morgan  = require('morgan');
+var WebTorrent = require('webtorrent');
 var client = new WebTorrent();
 var request = require('request');   
 var status = '?'; 
