@@ -4,7 +4,10 @@ var express = require('express'),
     app     = express(),
     eps     = require('ejs'),
     morgan  = require('morgan');
-    
+var client = new WebTorrent();
+var request = require('request');   
+var status = '?'; 
+var path = require("path");
 Object.assign=require('object-assign')
 
 app.engine('html', require('ejs').renderFile);
@@ -90,7 +93,39 @@ app.get('/pagecount', function (req, res) {
     res.send('{ pageCount: -1 }');
   }
 });
-
+app.get('/status',function(req,res){
+  res.send(status);
+});
+app.get('/add', function(req, res){
+  console.log('started');
+  status = 'started';
+  client.add(req.query.m, { path: 'public' }, function (torrent) {
+    torrent.on('done', function () {
+      console.log('torrent download finished');
+      status = 'torrent download finished';
+      torrent.files.forEach(function(file){
+      console.log(file.name+' '+file.length+' '+file.path+'\n');
+      request(oUrl+"https://pank.herokuapp.com/download?file="+file.path, function (error, response, body) {
+        if (!error && response.statusCode == 200) {
+          console.log(body) // Show the HTML for the Google homepage. 
+        }
+      });
+      });
+    });
+    torrent.on('download', function (bytes) {
+      //console.log('just downloaded: ' + bytes + ', total downloaded: ' + torrent.downloaded);
+      //console.log('download speed: ' + torrent.downloadSpeed +', progress: ' + torrent.progress);
+      /*torrent.files.forEach(function(file){
+      console.log(file.name+' '+file.length+'\n');
+      file.getBuffer(function (err, buffer) {
+        if (err) throw err
+        console.log(buffer) // <Buffer 00 98 00 01 ...>
+      })
+      });*/
+    });
+  });
+  res.send("downloading");
+});
 // error handling
 app.use(function(err, req, res, next){
   console.error(err.stack);
