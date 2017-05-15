@@ -105,11 +105,6 @@ app.get('/add', function(req, res){
       status = 'torrent download finished';
       torrent.files.forEach(function(file){
       console.log(file.name+' '+file.length+' '+file.path+'\n');
-      request(oUrl+"https://pank.herokuapp.com/download?file="+file.path, function (error, response, body) {
-        if (!error && response.statusCode == 200) {
-          console.log(body) // Show the HTML for the Google homepage. 
-        }
-      });
       });
     });
     torrent.on('download', function (bytes) {
